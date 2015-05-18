@@ -47,6 +47,41 @@ public class _EmployeeListAdditionsId implements java.io.Serializable {
 		this.empAlias = empAlias;
 		this.empUid = empUid;
 	}
+	/** array constructor */
+	public _EmployeeListAdditionsId(String[] args) {
+		this.empLname = args[0];
+		this.empFname = args[1];
+        this.empMinitial = args[2];
+        this.empCostcenternum = args[3];
+        this.empDept = args[4];
+        this.empTitle = args[5];
+        this.empAddress = args[6];
+        this.empMailcode = args[7];
+        this.empAlias = args[8];
+        this.empUid = args[9];
+  	}
+	
+	/** public void mergeInCoiEmp */
+	public void mergeInCoiEmp(CoiEmployee cEmp) {
+		cEmp.setEmpLname(this.empLname);
+		cEmp.setEmpFname(this.empFname);
+		cEmp.setEmpMinitial(this.empMinitial);
+		cEmp.setEmpF8(this.empCostcenternum);
+		cEmp.setEmpDept(this.empDept);
+		cEmp.setEmpTitle(this.empTitle);
+		cEmp.setEmpAddress(this.empAddress);
+		cEmp.setEmpMailCode(this.empMailcode.substring(0,5));  // first 5 chars
+		
+		String fixedAlias = this.empAlias.toLowerCase();
+		if (fixedAlias.indexOf("@") < 0)	{	fixedAlias += "@bu.edu"; }
+		cEmp.setEmpAlias(fixedAlias);
+
+		String fixedUid = this.empUid;
+		if (fixedUid.startsWith("U")) 		{	fixedUid = "0"+fixedUid; }
+		cEmp.setEmpUid(fixedUid);
+		
+		cEmp.setEmpActive(true);
+	}
 
 	// Property accessors
 

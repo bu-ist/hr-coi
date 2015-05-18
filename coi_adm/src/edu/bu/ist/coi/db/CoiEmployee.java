@@ -4,7 +4,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * CoiEmployee entity. @author MyEclipse Persistence Tools
+ * CoiEmployee entity. @author stetelba ( MyEclipse Persistence Tools )
  */
 
 public class CoiEmployee implements java.io.Serializable {
@@ -12,7 +12,7 @@ public class CoiEmployee implements java.io.Serializable {
 	// Fields
 
 	private String empUid;
-	private String empId;
+//	private String empId;
 	private String empLname;
 	private String empFname;
 	private String empMinitial;
@@ -27,7 +27,7 @@ public class CoiEmployee implements java.io.Serializable {
 	private String empMailCode;
 	private String empAlias;
 	private Boolean empActive;
-	private String empDisplayName;
+//	private String empDisplayName;
 	private Set coiInvitationses = new HashSet(0);
 	private Set coiActives = new HashSet(0);
 	private Set coiDisclosures = new HashSet(0);
@@ -41,7 +41,7 @@ public class CoiEmployee implements java.io.Serializable {
 	/** minimal constructor */
 	public CoiEmployee(String empUid, String empId) {
 		this.empUid = empUid;
-		this.empId = empId;
+//		this.empId = empId;
 	}
 
 	/** full constructor */
@@ -53,7 +53,7 @@ public class CoiEmployee implements java.io.Serializable {
 			String empDisplayName, Set coiInvitationses, Set coiActives,
 			Set coiDisclosures) {
 		this.empUid = empUid;
-		this.empId = empId;
+//		this.empId = empId;
 		this.empLname = empLname;
 		this.empFname = empFname;
 		this.empMinitial = empMinitial;
@@ -68,7 +68,7 @@ public class CoiEmployee implements java.io.Serializable {
 		this.empMailCode = empMailCode;
 		this.empAlias = empAlias;
 		this.empActive = empActive;
-		this.empDisplayName = empDisplayName;
+//		this.empDisplayName = empDisplayName;
 		this.coiInvitationses = coiInvitationses;
 		this.coiActives = coiActives;
 		this.coiDisclosures = coiDisclosures;
@@ -84,13 +84,13 @@ public class CoiEmployee implements java.io.Serializable {
 		this.empUid = empUid;
 	}
 
-	public String getEmpId() {
-		return this.empId;
-	}
+//	public String getEmpId() {
+//		return this.empId;
+//	}
 
-	public void setEmpId(String empId) {
-		this.empId = empId;
-	}
+//	public void setEmpId(String empId) {
+//		this.empId = empId;
+//	}
 
 	public String getEmpLname() {
 		return this.empLname;
@@ -204,13 +204,13 @@ public class CoiEmployee implements java.io.Serializable {
 		this.empActive = empActive;
 	}
 
-	public String getEmpDisplayName() {
-		return this.empDisplayName;
-	}
-
-	public void setEmpDisplayName(String empDisplayName) {
-		this.empDisplayName = empDisplayName;
-	}
+//	public String getEmpDisplayName() {
+//		return this.empDisplayName;
+//	}
+//
+//	public void setEmpDisplayName(String empDisplayName) {
+//		this.empDisplayName = empDisplayName;
+//	}
 
 	public Set getCoiInvitationses() {
 		return this.coiInvitationses;

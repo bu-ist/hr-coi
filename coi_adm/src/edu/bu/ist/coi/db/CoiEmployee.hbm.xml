@@ -10,9 +10,9 @@
             <column name="EMP_UID" length="10" />
             <generator class="assigned" />
         </id>
-        <property name="empId" type="java.lang.String">
-            <column name="EMP_ID" length="36" not-null="true" />
-        </property>
+<!--         <property name="empId" type="java.lang.String"> -->
+<!--             <column name="EMP_ID" length="36" not-null="true" /> -->
+<!--         </property> -->
         <property name="empLname" type="java.lang.String">
             <column name="EMP_LNAME" />
         </property>
@@ -55,9 +55,9 @@
         <property name="empActive" type="java.lang.Boolean">
             <column name="EMP_ACTIVE" />
         </property>
-        <property name="empDisplayName" type="java.lang.String">
-            <column name="EMP_DISPLAY_NAME" length="514" />
-        </property>
+<!--         <property name="empDisplayName" type="java.lang.String"> -->
+<!--             <column name="EMP_DISPLAY_NAME" length="514" /> -->
+<!--         </property> -->
         <set name="coiInvitationses" inverse="true">
             <key>
                 <column name="EMP_UID" length="10" not-null="true" />

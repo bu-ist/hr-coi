@@ -24,8 +24,14 @@ import javax.servlet.http.Part;
 
 import org.apache.catalina.connector.Request;
 import org.apache.log4j.Logger;
+import org.hibernate.Hibernate;
+import org.hibernate.Transaction;
+import org.hibernate.classic.Session;
 
 import com.opencsv.CSVReader;
+
+import edu.bu.ist.coi.db.CoiEmployee;
+import edu.bu.ist.coi.db.CoiEmployeeDAO;
 import edu.bu.ist.coi.db._EmployeeListAdditionsId;
 
 @WebServlet(name = "LoadEmployeesServlet", urlPatterns = { "/loadEmployees" })
@@ -73,20 +79,43 @@ public class LoadEmployeesServlet extends HttpServlet {
 
 		// Read CSV line by line and use the string array as you want
 		CSVReader csvReader = new CSVReader(new FileReader(serverFilePath));
-		List<_EmployeeListAdditionsId> emps = new ArrayList<_EmployeeListAdditionsId>();
+
 		String[] csvLine;
 		while ((csvLine = csvReader.readNext()) != null) {
-			_EmployeeListAdditionsId emp = new _EmployeeListAdditionsId(csvLine[5]); //TODO: 
-//	            emp.setId(record[0]);
-//	            emp.setName(record[1]);
-//	            emp.setRole(record[2]);
-//	            emp.setSalary(record[3]);
-	            emps.add(emp);
-			// Verifying the read data here
+			//_EmployeeListAdditionsId 
 			System.out.println(Arrays.toString(csvLine));
-		}
-		csvReader.close();
+			logger.info(Arrays.toString(csvLine));
+			   
+			_EmployeeListAdditionsId _emp = null;
+			try {
+				_emp = new _EmployeeListAdditionsId(csvLine);
+			} catch (ArrayIndexOutOfBoundsException e) {
+				logger.error("bad csv format");
+				continue;
+//				throw(e);				// TODO:  exception handling
+			}
+			CoiEmployee emp = new CoiEmployee();
+			CoiEmployeeDAO eDAO = new CoiEmployeeDAO();
 
+			org.hibernate.Session hibSession = eDAO.getSession();
+			Transaction hibTransaction = hibSession.beginTransaction();
+			
+			boolean found = true;
+			emp = (CoiEmployee)hibSession.get(CoiEmployee.class, _emp.getEmpUid());
+			if (emp == null){
+				found = false;
+				emp = new CoiEmployee();
+			}
+			_emp.mergeInCoiEmp(emp);
+//			eDAO.save(emp);
+//			eDAO.merge(emp);
+			if (found == true)
+				hibSession.saveOrUpdate(emp);
+			else
+				eDAO.save(emp);
+			hibTransaction.commit();
+		}	
+		csvReader.close();
 	}
   private String getUploadFolder() { //TODO: synchronization not handled.
     if (uploadFolder == null) {
