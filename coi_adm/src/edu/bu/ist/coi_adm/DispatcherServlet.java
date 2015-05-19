@@ -44,6 +44,7 @@ public class DispatcherServlet extends HttpServlet {
     try {
       processRequest(request, response);
     } catch (IOException e) {
+      logger.error(e.getMessage());
       out.print("<br>ERROR! " + e.getMessage());
     }
   }
