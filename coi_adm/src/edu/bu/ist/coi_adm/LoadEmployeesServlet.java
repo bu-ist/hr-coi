@@ -99,26 +99,27 @@ public class LoadEmployeesServlet extends HttpServlet {
 			} catch (ArrayIndexOutOfBoundsException e) {
 				logger.error("*** Bad csv format - skipping record ***");
 				continue;
-//				throw(e);				// TODO:  exception handling
+//				throw(e);				// TODO: better exception handling??
 			}
-			CoiEmployee emp = new CoiEmployee();
+			
 			CoiEmployeeDAO eDAO = new CoiEmployeeDAO();
 
 			org.hibernate.Session hibSession = eDAO.getSession();
 			Transaction hibTransaction = hibSession.beginTransaction();
 			
-			boolean found = true;
-			emp = (CoiEmployee)hibSession.get(CoiEmployee.class, _emp.getEmpUid());
+//			boolean found = true;
+			CoiEmployee emp = (CoiEmployee)hibSession.get(CoiEmployee.class, _emp.getEmpUid());
 			if (emp == null){
-				found = false;
+//				found = false;
+				logger.debug(" CoiEmployee not found: " + _emp.getEmpUid());
 				emp = new CoiEmployee();
 			}
+				
 			_emp.mergeInCoiEmp(emp);
+			hibSession.saveOrUpdate(emp);
 //			eDAO.merge(emp);
-			if (found == true)
-				hibSession.saveOrUpdate(emp);
-			else
-				eDAO.save(emp);
+//			if (found == true)		hibSession.saveOrUpdate(emp);
+//			else					eDAO.save(emp);
 			hibTransaction.commit();
 		}
 		csvReader.close();
