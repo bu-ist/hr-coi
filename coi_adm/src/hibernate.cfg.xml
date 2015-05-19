@@ -14,7 +14,7 @@
 			jdbc:jtds:sqlserver://ist-sql12test.bu.edu:1433;useNTLMv2=true;domain=ad
 		</property>
 		<property name="connection.username">stetelba</property>
-		<property name="connection.password">CHebureki.239</property>
+		<property name="connection.password">C.9</property>
 		<property name="connection.driver_class">
 			net.sourceforge.jtds.jdbc.Driver
 		</property>
