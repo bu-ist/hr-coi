@@ -59,6 +59,7 @@ public class _EmployeeListAdditionsId implements java.io.Serializable {
         this.empMailcode = args[7];
         this.empAlias = args[8];
         this.empUid = args[9];
+		if (this.empUid.startsWith("U")) 	{ this.empUid = "0"+this.empUid; }
   	}
 	
 	/** public void mergeInCoiEmp */
