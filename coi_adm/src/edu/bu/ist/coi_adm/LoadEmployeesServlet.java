@@ -42,19 +42,25 @@ public class LoadEmployeesServlet extends HttpServlet {
   private static volatile String uploadFolder = null;
   private static Logger logger = Logger.getLogger(LoadEmployeesServlet.class);
 
-  public LoadEmployeesServlet() {
-    super();
-  }
-  protected void doPost(HttpServletRequest request, HttpServletResponse response)
-      throws ServletException, IOException {
-    response.setContentType("text/html;charset=UTF-8");
-    final PrintWriter out = response.getWriter();
-    try {
-      processRequest(request, response);
-    } catch (IOException e) {
-      out.print("<br>ERROR! " + e.getMessage());
-    }
-  }
+	public LoadEmployeesServlet() {
+		super();
+	}
+
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		doPost(request, response);
+	}
+
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException,
+			IOException {
+		response.setContentType("text/html;charset=UTF-8");
+		
+		final PrintWriter out = response.getWriter();
+		try {
+			processRequest(request, response);
+		} catch (IOException e) {
+			System.out.print("<br>ERROR! " + e.getMessage());
+		}
+	}
 
 	protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException,
 			IOException {
@@ -67,15 +73,17 @@ public class LoadEmployeesServlet extends HttpServlet {
 		String writeMethod = request.getParameter("writemethod");
 		if (writeMethod == null) writeMethod = "";
 		if (writeMethod.equals("partwrite")) {
-			out.println("<br>Using Part.write method...");
+			System.out.println("<br>Using Part.write method...");
+			logger.info("Using Part.write method...");
 			filePart.write(serverFilePath);
 		} else {
-			out.println("<br>Using fileoutputstream method...");
+			System.out.println("<br>Using fileoutputstream method...");
+			logger.info("Using fileoutputstream method...");
 			writeToFileUsingFileOutputStream(filePart.getInputStream(), serverFilePath);
 		}
 		long timeAfter = System.currentTimeMillis();
-		out.println("<br>New file " + fileName + " created at " + uploadFolder);// serverFilePath);
-		out.println("<br>Time elapsed= " + (timeAfter - timeBefore));
+		logger.info("New file " + fileName + " created at " + uploadFolder);// serverFilePath);
+		logger.info("Time elapsed= " + (timeAfter - timeBefore));
 
 		// Read CSV line by line and use the string array as you want
 		CSVReader csvReader = new CSVReader(new FileReader(serverFilePath));
@@ -83,14 +91,13 @@ public class LoadEmployeesServlet extends HttpServlet {
 		String[] csvLine;
 		while ((csvLine = csvReader.readNext()) != null) {
 			//_EmployeeListAdditionsId 
-			System.out.println(Arrays.toString(csvLine));
 			logger.info(Arrays.toString(csvLine));
 			   
 			_EmployeeListAdditionsId _emp = null;
 			try {
 				_emp = new _EmployeeListAdditionsId(csvLine);
 			} catch (ArrayIndexOutOfBoundsException e) {
-				logger.error("bad csv format");
+				logger.error("*** Bad csv format - skipping record ***");
 				continue;
 //				throw(e);				// TODO:  exception handling
 			}
@@ -107,14 +114,13 @@ public class LoadEmployeesServlet extends HttpServlet {
 				emp = new CoiEmployee();
 			}
 			_emp.mergeInCoiEmp(emp);
-//			eDAO.save(emp);
 //			eDAO.merge(emp);
 			if (found == true)
 				hibSession.saveOrUpdate(emp);
 			else
 				eDAO.save(emp);
 			hibTransaction.commit();
-		}	
+		}
 		csvReader.close();
 	}
   private String getUploadFolder() { //TODO: synchronization not handled.
@@ -125,7 +131,7 @@ public class LoadEmployeesServlet extends HttpServlet {
       if (!dir.exists()) {
         boolean create = dir.mkdir();
         if (create) {
-          System.out.println("Uploads directory created:" + uploadFolder);
+          logger.info("Uploads directory created: " + uploadFolder);
         } else {
           throw new RuntimeException("Directory Cannot Be Created!");
         }
@@ -157,8 +163,7 @@ public class LoadEmployeesServlet extends HttpServlet {
     String[] sections = partHeader.split(";");
     for (String content : sections) {
       if (content.trim().startsWith("filename")) {
-        return content.substring(content.indexOf('=') + 1).trim()
-            .replace("\"", "");
+        return content.substring(content.indexOf('=') + 1).trim().replace("\"", "");
       }
     }
     return null;
@@ -170,4 +175,3 @@ public class LoadEmployeesServlet extends HttpServlet {
 	    return strDate;
 	}
 }
-
