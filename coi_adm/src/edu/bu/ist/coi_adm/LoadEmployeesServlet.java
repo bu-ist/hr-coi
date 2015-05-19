@@ -58,7 +58,7 @@ public class LoadEmployeesServlet extends HttpServlet {
 		try {
 			processRequest(request, response);
 		} catch (IOException e) {
-			System.out.print("<br>ERROR! " + e.getMessage());
+			out.print("<br>ERROR! " + e.getMessage());
 		}
 	}
 
@@ -73,11 +73,11 @@ public class LoadEmployeesServlet extends HttpServlet {
 		String writeMethod = request.getParameter("writemethod");
 		if (writeMethod == null) writeMethod = "";
 		if (writeMethod.equals("partwrite")) {
-			System.out.println("<br>Using Part.write method...");
+			out.println("<br>Using Part.write method...");
 			logger.info("Using Part.write method...");
 			filePart.write(serverFilePath);
 		} else {
-			System.out.println("<br>Using fileoutputstream method...");
+			out.println("<br>Using fileoutputstream method...");
 			logger.info("Using fileoutputstream method...");
 			writeToFileUsingFileOutputStream(filePart.getInputStream(), serverFilePath);
 		}
