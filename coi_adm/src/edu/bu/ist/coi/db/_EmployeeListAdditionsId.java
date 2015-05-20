@@ -21,6 +21,7 @@ public class _EmployeeListAdditionsId implements java.io.Serializable {
 	private String empMailcode;
 	private String empAlias;
 	private String empUid;
+	private Boolean empActive;
 
 	// Constructors
 
@@ -82,6 +83,21 @@ public class _EmployeeListAdditionsId implements java.io.Serializable {
 		cEmp.setEmpUid(fixedUid);
 		
 		cEmp.setEmpActive(true);
+	}
+	/** public void mergeInCoiEmp */
+	public void mergeOutCoiEmp(CoiEmployee cEmp) {
+		this.empLname = cEmp.getEmpLname();
+		this.empFname = cEmp.getEmpFname();
+		this.empMinitial = cEmp.getEmpMinitial();
+		this.empCostcenternum = cEmp.getEmpF8();
+		this.empDept = cEmp.getEmpDept();
+		this.empTitle = cEmp.getEmpTitle();
+		this.empAddress = cEmp.getEmpAddress();
+		this.empMailcode = cEmp.getEmpMailCode();
+		this.empAlias = cEmp.getEmpAlias();
+		this.empUid = cEmp.getEmpUid();
+		
+		this.empActive = cEmp.getEmpActive();
 	}
 
 	// Property accessors
@@ -215,4 +231,5 @@ public class _EmployeeListAdditionsId implements java.io.Serializable {
 		result = 37 * result + (getEmpUid() == null ? 0 : this.getEmpUid().hashCode());
 		return result;
 	}
+
 }
