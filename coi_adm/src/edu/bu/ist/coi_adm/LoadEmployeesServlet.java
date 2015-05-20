@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -29,6 +30,7 @@ import org.hibernate.Transaction;
 import org.hibernate.classic.Session;
 
 import com.opencsv.CSVReader;
+import com.opencsv.CSVWriter;
 
 import edu.bu.ist.coi.db.CoiEmployee;
 import edu.bu.ist.coi.db.CoiEmployeeDAO;
@@ -62,40 +64,41 @@ public class LoadEmployeesServlet extends HttpServlet {
 		}
 	}
 
-	protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException,
-			IOException {
+	protected void processRequest(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException,IOException {
 		final PrintWriter out = response.getWriter();
 		final Part filePart = request.getPart("file");
-		final String fileName = getCurrentTimeStamp() + "." + getFileName(filePart);
-		final String serverFilePath = getUploadFolder() + File.separator + fileName;
+		final String inFileName = getCurrentTimeStamp() + "." + getFileName(filePart);  // Server copy of input csv file
+		final String backFileName = "back." + inFileName;						// Server's backup csv file
+		final String uploadFolder = getUploadFolder();
+		final String inFilePath = uploadFolder + File.separator + inFileName;
+		final String backFilePath = uploadFolder + File.separator + backFileName;
 		long timeBefore = System.currentTimeMillis();
 
 		String writeMethod = request.getParameter("writemethod");
 		if (writeMethod == null) writeMethod = "";
 		if (writeMethod.equals("partwrite")) {
-			out.println("<br>Using Part.write method...");
+//			out.println("<br>Using Part.write method...");
 			logger.info("Using Part.write method...");
-			filePart.write(serverFilePath);
+			filePart.write(inFilePath);
 		} else {
-			out.println("<br>Using fileoutputstream method...");
+//			out.println("<br>Using fileoutputstream method...");
 			logger.info("Using fileoutputstream method...");
-			writeToFileUsingFileOutputStream(filePart.getInputStream(), serverFilePath);
+			writeToFileUsingFileOutputStream(filePart.getInputStream(), inFilePath);
 		}
 		long timeAfter = System.currentTimeMillis();
-		logger.info("New file " + fileName + " created at " + uploadFolder);// serverFilePath);
+		out.println("<br>New file " + inFileName + " created at " + uploadFolder);
+		logger.info("New file " + inFileName + " created at " + uploadFolder);
 		logger.info("Time elapsed= " + (timeAfter - timeBefore));
 
-		// Read CSV line by line and use the string array as you want
-		CSVReader csvReader = new CSVReader(new FileReader(serverFilePath));
-
-		String[] csvLine;
-		while ((csvLine = csvReader.readNext()) != null) {
-			//_EmployeeListAdditionsId 
-			logger.info(Arrays.toString(csvLine));
-			   
+		CSVReader csvReader = new CSVReader(new FileReader(inFilePath));
+		CSVWriter csvWriter = new CSVWriter(new FileWriter(backFilePath));
+		String[] inCsvLine;
+		while ((inCsvLine = csvReader.readNext()) != null) {
+			logger.info("in: "+Arrays.toString(inCsvLine));
 			_EmployeeListAdditionsId _emp = null;
 			try {
-				_emp = new _EmployeeListAdditionsId(csvLine);
+				_emp = new _EmployeeListAdditionsId(inCsvLine);
 			} catch (ArrayIndexOutOfBoundsException e) {
 				logger.error("*** Bad csv format - skipping record ***");
 				continue;
@@ -103,10 +106,8 @@ public class LoadEmployeesServlet extends HttpServlet {
 			}
 			
 			CoiEmployeeDAO eDAO = new CoiEmployeeDAO();
-
 			org.hibernate.Session hibSession = eDAO.getSession();
-			Transaction hibTransaction = hibSession.beginTransaction();
-			
+			Transaction hibTransaction = hibSession.beginTransaction();	
 //			boolean found = true;
 			CoiEmployee emp = (CoiEmployee)hibSession.get(CoiEmployee.class, _emp.getEmpUid());
 			if (emp == null){
@@ -114,7 +115,6 @@ public class LoadEmployeesServlet extends HttpServlet {
 				logger.debug(" CoiEmployee not found: " + _emp.getEmpUid());
 				emp = new CoiEmployee();
 			}
-				
 			_emp.mergeInCoiEmp(emp);
 			hibSession.saveOrUpdate(emp);
 //			eDAO.merge(emp);
@@ -126,8 +126,10 @@ public class LoadEmployeesServlet extends HttpServlet {
 	}
   private String getUploadFolder() { //TODO: synchronization not handled.
     if (uploadFolder == null) {
-      String contextRealPath = getServletContext().getRealPath("/");
-      uploadFolder = contextRealPath + File.separator + uploadFolderName;
+      uploadFolder = getServletContext().getRealPath("/");
+//     String upup = getServletContext().
+      if (!uploadFolder.endsWith(File.separator)) uploadFolder += File.separator;
+      uploadFolder += uploadFolderName;
       File dir = new File(uploadFolder);
       if (!dir.exists()) {
         boolean create = dir.mkdir();
