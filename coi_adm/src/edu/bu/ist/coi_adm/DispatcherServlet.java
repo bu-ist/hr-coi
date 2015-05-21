@@ -56,6 +56,8 @@ public class DispatcherServlet extends HttpServlet {
 		if (actionChoice == null) actionChoice = "";
 		if (actionChoice.equals("loadEmployees")) {
 			response.sendRedirect("LoadEmployees.jsp");
+		} else if (actionChoice.equals("activateEmployees")) {
+			response.sendRedirect("ActivateEmployees.jsp");
 		} else {
 			return;
 		}
