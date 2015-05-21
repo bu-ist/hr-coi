@@ -63,6 +63,40 @@ public class _EmployeeListAdditionsId implements java.io.Serializable {
 		if (this.empUid.startsWith("U")) 	{ this.empUid = "0"+this.empUid; }
   	}
 	
+	/** constructor from CoiEmployee */
+	public _EmployeeListAdditionsId(CoiEmployee cEmp) {
+		this.empLname = cEmp.getEmpLname();
+		this.empFname = cEmp.getEmpFname();
+		this.empMinitial = cEmp.getEmpMinitial();
+		this.empCostcenternum = cEmp.getEmpF8();
+		this.empDept = cEmp.getEmpDept();
+		this.empTitle = cEmp.getEmpTitle();
+		this.empAddress = cEmp.getEmpAddress();
+		this.empMailcode = cEmp.getEmpMailCode();
+		this.empAlias = cEmp.getEmpAlias();
+		this.empUid = cEmp.getEmpUid();
+		
+		this.empActive = cEmp.getEmpActive();
+	}
+
+	/** array de-constructor */
+	public String[] _EmpToStringArray() {
+		String[] args = new String[] {
+			this.empLname,
+			this.empFname,
+			this.empMinitial,
+			this.empCostcenternum,
+			this.empDept,
+	        this.empTitle,
+	        this.empAddress,
+	        this.empMailcode,
+	        this.empAlias,
+	        this.empUid,
+	        ""+this.empActive
+		};
+		return args;
+  	}
+	
 	/** public void mergeInCoiEmp */
 	public void mergeInCoiEmp(CoiEmployee cEmp) {
 		cEmp.setEmpLname(this.empLname);
@@ -83,21 +117,6 @@ public class _EmployeeListAdditionsId implements java.io.Serializable {
 		cEmp.setEmpUid(fixedUid);
 		
 		cEmp.setEmpActive(true);
-	}
-	/** public void mergeInCoiEmp */
-	public void mergeOutCoiEmp(CoiEmployee cEmp) {
-		this.empLname = cEmp.getEmpLname();
-		this.empFname = cEmp.getEmpFname();
-		this.empMinitial = cEmp.getEmpMinitial();
-		this.empCostcenternum = cEmp.getEmpF8();
-		this.empDept = cEmp.getEmpDept();
-		this.empTitle = cEmp.getEmpTitle();
-		this.empAddress = cEmp.getEmpAddress();
-		this.empMailcode = cEmp.getEmpMailCode();
-		this.empAlias = cEmp.getEmpAlias();
-		this.empUid = cEmp.getEmpUid();
-		
-		this.empActive = cEmp.getEmpActive();
 	}
 
 	// Property accessors
