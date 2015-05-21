@@ -114,6 +114,9 @@ public class LoadEmployeesServlet extends HttpServlet {
 //				found = false;
 				logger.debug(" CoiEmployee not found: " + _emp.getEmpUid());
 				emp = new CoiEmployee();
+			} else {
+				_EmployeeListAdditionsId _backEmp = new _EmployeeListAdditionsId(emp);
+				csvWriter.writeNext(_backEmp._EmpToStringArray());
 			}
 			_emp.mergeInCoiEmp(emp);
 			hibSession.saveOrUpdate(emp);
@@ -123,6 +126,7 @@ public class LoadEmployeesServlet extends HttpServlet {
 			hibTransaction.commit();
 		}
 		csvReader.close();
+		csvWriter.close();
 	}
   private String getUploadFolder() { //TODO: synchronization not handled.
     if (uploadFolder == null) {
