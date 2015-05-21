@@ -12,7 +12,7 @@
 	<form method="POST" action="dispatcher">
 			Choose an action: 
 		 <br /> <input type="radio" name="action" value="loadEmployees">Load Employees from .csv file
-		 <br /> <input type="radio" name="action" value="activate">Activate Employees
+		 <br /> <input type="radio" name="action" value="activateEmployees">Activate Employees from .csv file
 		 		 <br/> <br/> 
 		 <input type="submit" value="Submit" name="upload" id="upload" /> 
 		 <br/> <br/> <br/>
