@@ -10,10 +10,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.MultipartConfig;
@@ -23,11 +21,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Part;
 
-import org.apache.catalina.connector.Request;
 import org.apache.log4j.Logger;
-import org.hibernate.Hibernate;
 import org.hibernate.Transaction;
-import org.hibernate.classic.Session;
 
 import com.opencsv.CSVReader;
 import com.opencsv.CSVWriter;
@@ -73,7 +68,6 @@ public class LoadEmployeesServlet extends HttpServlet {
 		final String uploadFolder = getUploadFolder();
 		final String inFilePath = uploadFolder + File.separator + inFileName;
 		final String backFilePath = uploadFolder + File.separator + backFileName;
-		long timeBefore = System.currentTimeMillis();
 
 		String writeMethod = request.getParameter("writemethod");
 		if (writeMethod == null) writeMethod = "";
@@ -86,10 +80,8 @@ public class LoadEmployeesServlet extends HttpServlet {
 			logger.info("Using fileoutputstream method...");
 			writeToFileUsingFileOutputStream(filePart.getInputStream(), inFilePath);
 		}
-		long timeAfter = System.currentTimeMillis();
 		out.println("<br>New file " + inFileName + " created at " + uploadFolder);
 		logger.info("New file " + inFileName + " created at " + uploadFolder);
-		logger.info("Time elapsed= " + (timeAfter - timeBefore));
 
 		CSVReader csvReader = new CSVReader(new FileReader(inFilePath));
 		CSVWriter csvWriter = new CSVWriter(new FileWriter(backFilePath));
