@@ -1,8 +1,6 @@
 package edu.bu.ist.coi.db;
 
-import java.sql.Timestamp;
 import java.util.List;
-import java.util.Set;
 import org.hibernate.LockMode;
 import org.hibernate.Query;
 import org.hibernate.criterion.Example;
@@ -18,7 +16,7 @@ import org.slf4j.LoggerFactory;
  * to configure it for the desired type of transaction control.
  * 
  * @see edu.bu.ist.coi.db.CoiDisclosure
- * @author MyEclipse Persistence Tools
+ * @author stetelba & MyEclipse Persistence Tools
  */
 
 public class CoiDisclosureDAO extends BaseHibernateDAO {
