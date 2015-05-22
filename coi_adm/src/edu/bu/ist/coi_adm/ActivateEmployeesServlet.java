@@ -1,7 +1,6 @@
 package edu.bu.ist.coi_adm;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
@@ -9,10 +8,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.MultipartConfig;
@@ -22,7 +19,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Part;
 
-import org.apache.catalina.connector.Request;
 import org.apache.log4j.Logger;
 import org.hibernate.Hibernate;
 import org.hibernate.Transaction;
@@ -30,9 +26,11 @@ import org.hibernate.classic.Session;
 
 import com.opencsv.CSVReader;
 
+import edu.bu.ist.coi.db.CoiActive;
+import edu.bu.ist.coi.db.CoiActiveDAO;
+import edu.bu.ist.coi.db.CoiActiveId;
 import edu.bu.ist.coi.db.CoiEmployee;
 import edu.bu.ist.coi.db.CoiEmployeeDAO;
-import edu.bu.ist.coi.db._EmployeeListAdditionsId;
 
 @WebServlet(name = "ActivateEmployeesServlet", urlPatterns = { "/activateEmployees" })
 @MultipartConfig
@@ -73,36 +71,37 @@ public class ActivateEmployeesServlet extends HttpServlet {
 		String[] csvLine;
 		while ((csvLine = csvReader.readNext()) != null) {
 			//_EmployeeListAdditionsId 
-			out.println(Arrays.toString(csvLine));
+//			out.println(Arrays.toString(csvLine));
 			logger.info(Arrays.toString(csvLine));
 			   
-			_EmployeeListAdditionsId _emp = null;
+			String uid = null;
+			int year = 0;
+	        boolean isSenior = false;    
 			try {
-				_emp = new _EmployeeListAdditionsId(csvLine);
+				uid = csvLine[0];
+				year = Integer.parseInt(csvLine[1]);
+		        isSenior = Boolean.parseBoolean(csvLine[2]);        
 			} catch (ArrayIndexOutOfBoundsException e) {
-				logger.error("bad csv format");
+				logger.error("*** Bad csv format - skipping record ***");
 				continue;
-//				throw(e);				// TODO:  exception handling
+//				TODO??:  exception handling
 			}
-			CoiEmployee emp = new CoiEmployee();
+		
 			CoiEmployeeDAO eDAO = new CoiEmployeeDAO();
-
 			org.hibernate.Session hibSession = eDAO.getSession();
-			Transaction hibTransaction = hibSession.beginTransaction();
-			
-			boolean found = true;
-			emp = (CoiEmployee)hibSession.get(CoiEmployee.class, _emp.getEmpUid());
+			Transaction hibTransaction = hibSession.beginTransaction();	
+			CoiEmployee emp = (CoiEmployee)hibSession.get(CoiEmployee.class, uid);
 			if (emp == null){
-				found = false;
-				emp = new CoiEmployee();
+				logger.error("*** CoiEmployee not found: " + uid + " - skipping ***");
+//				// TODO??:  possible exception handling
+				continue;
 			}
-			_emp.mergeInCoiEmp(emp);
-//			eDAO.save(emp);
-//			eDAO.merge(emp);
-			if (found == true)
-				hibSession.saveOrUpdate(emp);
-			else
-				eDAO.save(emp);
+			CoiActiveId actId = new CoiActiveId(emp, year);
+			CoiActive actRecord = new CoiActive(actId, isSenior);
+			CoiActiveDAO actDAO = new CoiActiveDAO();
+			
+//			actDAO.save(actRecord);  //FIXME: add dup record processing
+			hibSession.saveOrUpdate(actRecord);;
 			hibTransaction.commit();
 		}	
 		csvReader.close();
