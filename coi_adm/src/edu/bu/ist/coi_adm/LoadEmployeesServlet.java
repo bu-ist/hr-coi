@@ -35,7 +35,7 @@ import edu.bu.ist.coi.db._EmployeeListAdditionsId;
 @MultipartConfig
 public class LoadEmployeesServlet extends HttpServlet {
   private static final long serialVersionUID = 1L;
-  private static final String uploadFolderName = "uploads";
+  private static final String uploadFolderName = "Uploads";
   private static volatile String uploadFolder = null;
   private static Logger logger = Logger.getLogger(LoadEmployeesServlet.class);
 
@@ -122,8 +122,9 @@ public class LoadEmployeesServlet extends HttpServlet {
 	}
   private String getUploadFolder() { //TODO: synchronization not handled.
     if (uploadFolder == null) {
-      uploadFolder = getServletContext().getRealPath("/");
-//     String upup = getServletContext().
+//      uploadFolder = getServletContext().getRealPath("/");
+      uploadFolder = System.getProperty("catalina.base");
+
       if (!uploadFolder.endsWith(File.separator)) uploadFolder += File.separator;
       uploadFolder += uploadFolderName;
       File dir = new File(uploadFolder);
