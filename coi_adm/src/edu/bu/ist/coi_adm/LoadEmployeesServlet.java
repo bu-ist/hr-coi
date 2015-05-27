@@ -74,19 +74,25 @@ public class LoadEmployeesServlet extends HttpServlet {
 			logger.info("Using fileoutputstream method...");
 			Uploader.writeToFileUsingFileOutputStream(filePart.getInputStream(), inFilePath);
 		}
-		out.println("<br>New file " + inFileName + " created at " + uploadFolder);
+	
+		out.println("<br>Uploading file '"+Uploader.getFileName(filePart)+"'");
 		logger.info("New file " + inFileName + " created at " + uploadFolder);
 
 		CSVReader csvReader = new CSVReader(new FileReader(inFilePath));
 		CSVWriter csvWriter = new CSVWriter(new FileWriter(backFilePath));
 		String[] inCsvLine;
-		while ((inCsvLine = csvReader.readNext()) != null) {
-			logger.info("in: "+Arrays.toString(inCsvLine));
+
+		for (int lineNo=1, badNo=0; (inCsvLine = csvReader.readNext()) != null; lineNo++) {
+			logger.debug("in: "+lineNo+":"+Arrays.toString(inCsvLine));
 			_EmployeeListAdditionsId _emp = null;
 			try {
 				_emp = new _EmployeeListAdditionsId(inCsvLine);
 			} catch (ArrayIndexOutOfBoundsException e) {
-				logger.error("*** Bad csv format - skipping record ***");
+				++badNo;
+				String msg = "*** Bad csv format on line " + lineNo + "- skipping record..";
+				out.println("<br>"+msg+"<br>");
+				out.println(lineNo+":"+Arrays.toString(inCsvLine));
+				logger.error(msg);
 				continue;
 //				throw(e);				// TODO: better exception handling??
 			}
