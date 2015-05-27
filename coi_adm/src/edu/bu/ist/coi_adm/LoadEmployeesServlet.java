@@ -1,17 +1,12 @@
 package edu.bu.ist.coi_adm;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
+
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.io.PrintWriter;
-import java.text.SimpleDateFormat;
 import java.util.Arrays;
-import java.util.Date;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.MultipartConfig;
@@ -35,8 +30,6 @@ import edu.bu.ist.coi.db._EmployeeListAdditionsId;
 @MultipartConfig
 public class LoadEmployeesServlet extends HttpServlet {
   private static final long serialVersionUID = 1L;
-  private static final String uploadFolderName = "Uploads";
-  private static volatile String uploadFolder = null;
   private static Logger logger = Logger.getLogger(LoadEmployeesServlet.class);
 
 	public LoadEmployeesServlet() {
@@ -63,9 +56,10 @@ public class LoadEmployeesServlet extends HttpServlet {
 			throws ServletException,IOException {
 		final PrintWriter out = response.getWriter();
 		final Part filePart = request.getPart("file");
-		final String inFileName = getCurrentTimeStamp() + "." + getFileName(filePart);  // Server copy of input csv file
-		final String backFileName = "back." + inFileName;						// Server's backup csv file
-		final String uploadFolder = getUploadFolder();
+		final String inFileName = Uploader.getCurrentTimeStamp() + 
+				"." + Uploader.getFileName(filePart);  		// Server copy of input csv file
+		final String backFileName = "back." + inFileName;	// Server's backup csv file
+		final String uploadFolder = Uploader.getUploadFolder();
 		final String inFilePath = uploadFolder + File.separator + inFileName;
 		final String backFilePath = uploadFolder + File.separator + backFileName;
 
@@ -78,7 +72,7 @@ public class LoadEmployeesServlet extends HttpServlet {
 		} else {
 //			out.println("<br>Using fileoutputstream method...");
 			logger.info("Using fileoutputstream method...");
-			writeToFileUsingFileOutputStream(filePart.getInputStream(), inFilePath);
+			Uploader.writeToFileUsingFileOutputStream(filePart.getInputStream(), inFilePath);
 		}
 		out.println("<br>New file " + inFileName + " created at " + uploadFolder);
 		logger.info("New file " + inFileName + " created at " + uploadFolder);
@@ -119,59 +113,5 @@ public class LoadEmployeesServlet extends HttpServlet {
 		}
 		csvReader.close();
 		csvWriter.close();
-	}
-  private String getUploadFolder() { //TODO: synchronization not handled.
-    if (uploadFolder == null) {
-//      uploadFolder = getServletContext().getRealPath("/");
-      uploadFolder = System.getProperty("catalina.base");
-
-      if (!uploadFolder.endsWith(File.separator)) uploadFolder += File.separator;
-      uploadFolder += uploadFolderName;
-      File dir = new File(uploadFolder);
-      if (!dir.exists()) {
-        boolean create = dir.mkdir();
-        if (create) {
-          logger.info("Uploads directory created: " + uploadFolder);
-        } else {
-          throw new RuntimeException("Directory Cannot Be Created!");
-        }
-      }
-    }
-    return uploadFolder;
-  }
-  private void writeToFileUsingFileOutputStream(InputStream filecontent,
-      String filePath) throws IOException {
-    OutputStream out = null;
-    try {
-      out = new FileOutputStream(new File(filePath));
-      int read = 0;
-      final byte[] bytes = new byte[1024];
-      while ((read = filecontent.read(bytes)) != -1) {
-        out.write(bytes, 0, read);
-      }
-    } finally {
-      if (out != null) {
-        out.close();
-      }
-      if (filecontent != null) {
-        filecontent.close();
-      }
-    }
-  }
-  private String getFileName(final Part part) {
-    final String partHeader = part.getHeader("content-disposition");
-    String[] sections = partHeader.split(";");
-    for (String content : sections) {
-      if (content.trim().startsWith("filename")) {
-        return content.substring(content.indexOf('=') + 1).trim().replace("\"", "");
-      }
-    }
-    return null;
-  }
-  private static String getCurrentTimeStamp() {
-	    SimpleDateFormat sdfDate = new SimpleDateFormat("yyyyMMdd_HHmm-ss");
-	    Date now = new Date();
-	    String strDate = sdfDate.format(now);
-	    return strDate;
 	}
 }
