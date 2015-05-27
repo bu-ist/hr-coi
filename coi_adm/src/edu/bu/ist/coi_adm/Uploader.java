@@ -22,7 +22,6 @@ public class Uploader  {
 	    if (uploadFolder == null) {
 //	      uploadFolder = getServletContext().getRealPath("/");
 	      uploadFolder = System.getProperty("catalina.base");
-
 	      if (!uploadFolder.endsWith(File.separator)) uploadFolder += File.separator;
 	      uploadFolder += uploadFolderName;
 	      File dir = new File(uploadFolder);
