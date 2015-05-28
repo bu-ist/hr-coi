@@ -56,47 +56,44 @@ public class LoadEmployeesServlet extends HttpServlet {
 			throws ServletException,IOException {
 		final PrintWriter out = response.getWriter();
 		final Part filePart = request.getPart("file");
-		final String inFileName = Uploader.getCurrentTimeStamp() + 
-				"." + Uploader.getFileName(filePart);  		// Server copy of input csv file
-		final String backFileName = "back." + inFileName;	// Server's backup csv file
+		final String inpFileName = Uploader.getFileName(filePart); 
+		final String savedFileName = Uploader.getCurrentTimeStamp()+"."+inpFileName;  // Server copy of input csv file
+		final String backFileName = "back." + savedFileName;	// Server's backup csv file
 		final String uploadFolder = Uploader.getUploadFolder();
-		final String inFilePath = uploadFolder + File.separator + inFileName;
+		final String savedFilePath = uploadFolder + File.separator + savedFileName;
 		final String backFilePath = uploadFolder + File.separator + backFileName;
 
 		String writeMethod = request.getParameter("writemethod");
 		if (writeMethod == null) writeMethod = "";
 		if (writeMethod.equals("partwrite")) {
-//			out.println("<br>Using Part.write method...");
 			logger.info("Using Part.write method...");
-			filePart.write(inFilePath);
+			filePart.write(savedFilePath);
 		} else {
-//			out.println("<br>Using fileoutputstream method...");
 			logger.info("Using fileoutputstream method...");
-			Uploader.writeToFileUsingFileOutputStream(filePart.getInputStream(), inFilePath);
+			Uploader.writeToFileUsingFileOutputStream(filePart.getInputStream(), savedFilePath);
 		}
 	
-		out.println("<br>Uploading file '"+Uploader.getFileName(filePart)+"'");
-		logger.info("New file " + inFileName + " created at " + uploadFolder);
+		out.println("<br>Uploading file '"+inpFileName+"':<br>");
+		logger.info("New file " + savedFileName + " created at " + uploadFolder);
 
-		CSVReader csvReader = new CSVReader(new FileReader(inFilePath));
+		CSVReader csvReader = new CSVReader(new FileReader(savedFilePath));
 		CSVWriter csvWriter = new CSVWriter(new FileWriter(backFilePath));
 		String[] inCsvLine;
 
-		for (int lineNo=1, badNo=0; (inCsvLine = csvReader.readNext()) != null; lineNo++) {
+		int lineNo=1, badNo=0;
+		for (; (inCsvLine = csvReader.readNext()) != null; lineNo++) {
 			logger.debug("in: "+lineNo+":"+Arrays.toString(inCsvLine));
 			_EmployeeListAdditionsId _emp = null;
 			try {
 				_emp = new _EmployeeListAdditionsId(inCsvLine);
 			} catch (ArrayIndexOutOfBoundsException e) {
 				++badNo;
-				String msg = "*** Bad csv format on line " + lineNo + "- skipping record..";
-				out.println("<br>"+msg+"<br>");
-				out.println(lineNo+":"+Arrays.toString(inCsvLine));
+				String msg = "* bad CSV, skipping line " + lineNo+": " + Arrays.toString(inCsvLine);
+				out.println("<br>" + msg);
 				logger.error(msg);
 				continue;
 //				throw(e);				// TODO: better exception handling??
 			}
-			
 			CoiEmployeeDAO eDAO = new CoiEmployeeDAO();
 			org.hibernate.Session hibSession = eDAO.getSession();
 			Transaction hibTransaction = hibSession.beginTransaction();	
@@ -117,6 +114,8 @@ public class LoadEmployeesServlet extends HttpServlet {
 //			else					eDAO.save(emp);
 			hibTransaction.commit();
 		}
+		out.println("<br><br>Uploaded file '"+inpFileName+"'");
+		out.println("<br>There were "+badNo+" skipped lines out of " + (lineNo-1) + " total.");
 		csvReader.close();
 		csvWriter.close();
 	}
